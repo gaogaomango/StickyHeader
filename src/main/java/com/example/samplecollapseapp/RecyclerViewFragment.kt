@@ -8,7 +8,7 @@ import android.view.ViewGroup
 import android.widget.TextView
 import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.Fragment
-import androidx.recyclerview.widget.GridLayoutManager
+import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.samplecollapseapp.databinding.ViewHeaderBinding
 import com.example.samplecollapseapp.databinding.ViewItemBinding
@@ -19,19 +19,15 @@ class RecyclerViewFragment : Fragment() {
 
     private lateinit var adapter: RecyclerViewAdapter
 
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-    }
-
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
         val v = inflater.inflate(R.layout.fragment_recycler_view, container, false)
-v.recyclerView.setHasFixedSize(true)
+        v.recyclerView.setHasFixedSize(true)
         adapter = RecyclerViewAdapter()
         v.recyclerView.adapter = adapter
-        v.recyclerView.layoutManager = GridLayoutManager(context, 1)
+        v.recyclerView.layoutManager = LinearLayoutManager(context)
         v.recyclerView.addItemDecoration(StickyHeaderItemDecoration(adapter))
 
         adapter.items = createItems()
@@ -47,7 +43,7 @@ v.recyclerView.setHasFixedSize(true)
             val item = if (isHeader) {
                 Item(Item.Type.HEADER, "header$i")
             } else {
-                Item(Item.Type.ITEM,"item$i")
+                Item(Item.Type.ITEM, "item$i")
             }
             items.add(item)
         }
@@ -65,7 +61,8 @@ v.recyclerView.setHasFixedSize(true)
     }
 }
 
-class RecyclerViewAdapter : RecyclerView.Adapter<RecyclerView.ViewHolder>(), StickyHeaderItemDecoration.StickyHeaderInterface {
+class RecyclerViewAdapter : RecyclerView.Adapter<RecyclerView.ViewHolder>(),
+    StickyHeaderItemDecoration.StickyHeaderInterface {
 
     var items: List<Item> = mutableListOf()
     var headerTitle: String = ""
@@ -75,11 +72,13 @@ class RecyclerViewAdapter : RecyclerView.Adapter<RecyclerView.ViewHolder>(), Sti
     override fun getItemViewType(position: Int) = items[position].type.ordinal
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder {
-        return if(viewType == Item.Type.HEADER.ordinal) HeaderViewHolder.create(parent) else ItemViewHolder.create(parent)
+        return if (viewType == Item.Type.HEADER.ordinal) HeaderViewHolder.create(parent) else ItemViewHolder.create(
+            parent
+        )
     }
 
     override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int) {
-        when(holder) {
+        when (holder) {
             is HeaderViewHolder -> holder.update(items[position])
             is ItemViewHolder -> holder.update(items[position])
         }
@@ -121,7 +120,8 @@ class RecyclerViewAdapter : RecyclerView.Adapter<RecyclerView.ViewHolder>(), Sti
         fun update(item: Item?)
     }
 
-    private class HeaderViewHolder(binding: ViewHeaderBinding) : RecyclerView.ViewHolder(binding.root), ViewHolderInterface {
+    private class HeaderViewHolder(binding: ViewHeaderBinding) :
+        RecyclerView.ViewHolder(binding.root), ViewHolderInterface {
         private val binding: ViewHeaderBinding = binding
         override fun update(item: Item?) {
             binding.setItem(item)
@@ -141,7 +141,8 @@ class RecyclerViewAdapter : RecyclerView.Adapter<RecyclerView.ViewHolder>(), Sti
         }
     }
 
-    private class ItemViewHolder(binding: ViewItemBinding) : RecyclerView.ViewHolder(binding.root), ViewHolderInterface {
+    private class ItemViewHolder(binding: ViewItemBinding) : RecyclerView.ViewHolder(binding.root),
+        ViewHolderInterface {
         private val binding: ViewItemBinding = binding
         override fun update(item: Item?) {
             binding.setItem(item)
@@ -160,7 +161,6 @@ class RecyclerViewAdapter : RecyclerView.Adapter<RecyclerView.ViewHolder>(), Sti
             }
         }
     }
-
 }
 
 data class Item(var type: Type, var text: String) {
